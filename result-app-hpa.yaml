@@ -1,0 +1,36 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+    name: result-app-hpa
+    namespace: voting-app
+spec:
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: result-app-deploy
+    minReplicas: 1
+    maxReplicas: 30
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     target:
+    #       type: AverageValue
+    #       averageValue: 1000Mi
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 10
+          type: Pods
+          value: 3
+        # - periodSeconds: 20
+        #   type: Percent
+        #   value: 10
+        selectPolicy: Max
+        stabilizationWindowSeconds: 15
